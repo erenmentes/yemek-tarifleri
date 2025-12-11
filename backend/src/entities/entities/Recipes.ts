@@ -1,6 +1,6 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { Categories } from "./Categories";
-import { Ingredients } from "./Ingredients";
+import { RecipeIngredients } from "./RecipeIngredients";
 import { Users } from "./Users";
 
 @Index("recipes_pk", ["recipeId"], { unique: true })
@@ -22,9 +22,8 @@ export class Recipes {
   @JoinColumn([{ name: "category_id", referencedColumnName: "categoryId" }])
   category: Categories;
 
-  @ManyToOne(() => Ingredients, (ingredients) => ingredients.recipes)
-  @JoinColumn([{ name: "ingredient_id", referencedColumnName: "ingredientId" }])
-  ingredient: Ingredients;
+  @OneToMany(() => RecipeIngredients, (ri) => ri.recipe)
+  recipeIngredients: RecipeIngredients[];
 
   @ManyToOne(() => Users, (users) => users.recipes)
   @JoinColumn([{ name: "user_id", referencedColumnName: "user_id" }])

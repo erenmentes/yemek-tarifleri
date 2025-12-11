@@ -1,4 +1,4 @@
-import { Body, Injectable } from '@nestjs/common';
+import { Body, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Categories } from 'src/entities/entities/Categories';
 import { Recipes } from 'src/entities/entities/Recipes';
@@ -45,7 +45,7 @@ export class RecipesService {
             user_id: FoundUser?.user_id
         };
 
-        const createdRecipe =  this.recipesRepo.create({ recipeTitle: newRecipe.recipe_title, recipeContent: newRecipe.recipe_content, recipeCreatedate: newRecipe.recipe_createdate, category: FoundCategory, user: FoundUser });
+        const createdRecipe = this.recipesRepo.create({ recipeTitle: newRecipe.recipe_title, recipeContent: newRecipe.recipe_content, recipeCreatedate: newRecipe.recipe_createdate, category: FoundCategory, user: FoundUser });
         await this.recipesRepo.save(createdRecipe);
 
         await Promise.all(createRecipeDto.IngredientList.map(async ingredient => {
@@ -82,5 +82,32 @@ export class RecipesService {
 
         return await this.recipesRepo.update({ recipeTitle: createRecipeDto.recipe_title }, { recipeTitle: createRecipeDto.recipe_title, recipeContent: createRecipeDto.recipe_content, recipeCreatedate: formattedDate });
     };
+
+    async filterRecipesByCategory(category: string) {
+        const FoundCategory = await this.categoriesRepo.findOne({ where: { categoryName: category } });
+        if (!FoundCategory) throw new NotFoundException("Category not found.");
+        let FoundRecipes = await this.recipesRepo.find({ where: { category: FoundCategory } });
+        if (!FoundRecipes) throw new NotFoundException("Recipes not found.");
+        return FoundRecipes;
+    };
+
+    async filterRecipesByIngredients(ingredients: string[]): Promise<Recipes[]> {
+        if (!ingredients || ingredients.length === 0) {
+            throw new NotFoundException("No ingredients provided.");
+        }
+
+        const recipes = await this.recipesRepo
+            .createQueryBuilder("recipe")
+            .leftJoinAndSelect("recipe.recipeIngredients", "ri")
+            .leftJoinAndSelect("ri.ingredient", "ingredient")
+            .where("ingredient.ingredientName IN (:...ingredients)", { ingredients })
+            .getMany();
+
+        if (!recipes || recipes.length === 0) {
+            throw new NotFoundException("No recipes found with the given ingredients.");
+        }
+
+        return recipes;
+    }
 
 }
