@@ -1,0 +1,5 @@
+const JwtConstants = {
+    secret : "deneme123123123123",
+};
+
+export default JwtConstants;
