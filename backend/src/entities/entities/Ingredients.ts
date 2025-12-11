@@ -11,6 +11,6 @@ export class Ingredients {
   @Column("character varying", { name: "ingredient_name", unique: true })
   ingredientName: string;
 
-  @OneToMany(() => Recipes, (recipes) => recipes.ingredient)
+  @OneToMany(() => Recipes, (recipes) => recipes.recipeIngredients)
   recipes: Recipes[];
 }

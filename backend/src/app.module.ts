@@ -8,6 +8,7 @@ import { Comments } from 'src/entities/entities/Comments';
 import { Recipes } from 'src/entities/entities/Recipes';
 import { Categories } from 'src/entities/entities/Categories';
 import { Ingredients } from 'src/entities/entities/Ingredients';
+import { RecipeIngredients } from 'src/entities/entities/RecipeIngredients';
 import { RecipesModule } from './recipes/recipes.module';
 import { CategoryModule } from './category/category.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
@@ -22,7 +23,7 @@ import { IngredientsModule } from './ingredients/ingredients.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       schema : process.env.DB_SCHEMA,
-      entities: [Users,Comments,Recipes,Categories,Ingredients],
+      entities: [Users,Comments,Recipes,Categories,Ingredients,RecipeIngredients],
       synchronize: false,
       logging: true,
       extra: {
